@@ -1,0 +1,5 @@
+pandas
+web.py
+py2neo
+jieba
+scikit_learn

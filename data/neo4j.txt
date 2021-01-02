@@ -1,0 +1,28 @@
+
+
+//导入节点 南开大学相关名词及信息 注意类型转换
+LOAD CSV WITH HEADERS FROM "file:///NK.csv" AS line
+MERGE (n:NK {nid:toInteger(line.nid), name:line.name, info:line.info, buildtime:line.buildtime, leader:line.leader,
+             college:line.college, web:line.web, departments:line.departments})
+
+//导入节点 教师信息
+LOAD CSV WITH HEADERS FROM 'file:///person.csv' AS line
+MERGE (p:Person { pid:toInteger(line.pid), name:line.name, research:line.research})
+
+// 导入节点 职称
+LOAD CSV WITH HEADERS FROM "file:///professional_title.csv" AS line
+MERGE (t:Pt{tid:toInteger(line.tid), name:line.name})
+
+// 导入节点 所属部门
+LOAD CSV WITH HEADERS FROM "file:///department.csv" AS line
+MERGE (d:Department{did:toInteger(line.did), name:line.name})
+
+// 导入关系 教师有什么职称
+LOAD CSV WITH HEADERS FROM "file:///person_to_pt.csv" AS line
+match (from:Person{pid:toInteger(line.pid)}),(to:Pt{tid:toInteger(line.tid)})
+merge (from)-[r:pt{pid:toInteger(line.pid),tid:toInteger(line.tid)}]->(to)
+
+//导入关系 教师所属哪个部门
+LOAD CSV WITH HEADERS FROM "file:///person_to_department.csv" AS line
+match (from:Person{pid:toInteger(line.pid)}),(to:Department{did:toInteger(line.did)})
+merge (from)-[r:in{pid:toInteger(line.pid),did:toInteger(line.did)}]->(to)
